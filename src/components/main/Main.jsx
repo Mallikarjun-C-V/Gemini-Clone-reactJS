@@ -3,7 +3,7 @@ import './Main.css'
 import { assets } from '../../assets/assets'
 import { Context } from '../../context/Context'
 
-const main = () => {
+const Main = ({ displayedName, animationClass }) => {
 
     const { onSent, recentPrompt, showResult, loading, resultData, setInput, input } = useContext(Context);
 
@@ -19,7 +19,16 @@ const main = () => {
                 {!showResult
                     ? <>
                         <div className="greet">
-                            <p><span>Hello, Devv</span></p>
+                            <p>
+                                <span>
+                                    Hello,{' '}
+                                    <div className="greet-name-container">
+                                        <span className={`greet-name ${animationClass}`}>
+                                            {displayedName}
+                                        </span>
+                                    </div>
+                                </span>
+                            </p>
                             <p>How can I help u today</p>
                         </div>
                         <div className="cards">
@@ -68,7 +77,7 @@ const main = () => {
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && input) {
                                     onSent();
-                                    setInput("");  
+                                    setInput("");
                                 }
                             }}
                             value={input}
@@ -80,7 +89,7 @@ const main = () => {
                             <img src={assets.mic_icon} alt="" />
                             {input ? <img onClick={() => {
                                 onSent();
-                                setInput("");  
+                                setInput("");
                             }} src={assets.send_icon} alt="" /> : null}
                         </div>
                     </div>
@@ -93,4 +102,4 @@ const main = () => {
     )
 }
 
-export default main
+export default Main

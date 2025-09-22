@@ -1,14 +1,41 @@
-import React from 'react'
-import Sidebar from './components/sidebar/Sidebar'
-import Main from './components/main/Main'
+import React, { useState } from 'react';
+import Sidebar from './components/Sidebar/Sidebar';
+import Main from './components/Main/Main';
+import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 
 const App = () => {
+  const [userName, setUserName] = useState(null);
+  
+  const [displayedName, setDisplayedName] = useState('ಅನಾಮಿಕ'); 
+  
+  const [animationClass, setAnimationClass] = useState('');
+
+  const handleNameSubmit = (newName) => {
+    setUserName(newName); 
+
+    setTimeout(() => {
+      setAnimationClass('slide-out');
+
+      setTimeout(() => {
+        setDisplayedName(newName);
+        setAnimationClass('slide-in');
+      }, 500);
+
+    }, 1000);
+  };
+
   return (
     <>
-      <Sidebar/>  
-      <Main/>
+      {!userName && <WelcomeModal onNameSubmit={handleNameSubmit} />}
+      
+      <Sidebar />
+      
+      <Main 
+        displayedName={displayedName} 
+        animationClass={animationClass} 
+      />
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;

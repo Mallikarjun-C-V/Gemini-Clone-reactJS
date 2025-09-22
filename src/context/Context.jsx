@@ -4,7 +4,6 @@ import runChat from "../config/gemini";
 export const Context = createContext();
 
 const ContextProvider = ({ children }) => {
-
     const [input, setInput] = useState("");
     const [recentPrompt, setRecentPrompt] = useState("");
     const [prevPrompts, setPrevPrompts] = useState([]);
@@ -12,57 +11,50 @@ const ContextProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [resultData, setResultData] = useState("");
 
-    const delayPara = (index,nextword) => {
-        setTimeout(function() {
-            setResultData(prev=>prev + nextword + " ")
-        },75*index)
-    }
+    const delayPara = (index, nextWord) => {
+        setTimeout(function () {
+            setResultData(prev => prev + nextWord + " ");
+        }, 75 * index);
+    };
 
-    const newChat = () =>{
-        setLoading(false)
-        setShowResult(false)
-    }
+    const newChat = () => {
+        setLoading(false);
+        setShowResult(false);
+    };
 
     const onSent = async (prompt) => {
-
         setResultData("");
         setLoading(true);
         setShowResult(true);
-        let response;
-        if (prompt !== undefined) {
-            response = await runChat(prompt);
-            setRecentPrompt(prompt)
-        }
-        else{
-            setPrevPrompts(prev=>[...prev,input])
-            setRecentPrompt(input)
-            response = await runChat(input)
-        }
- 
-        let responseArray = response.split("**");
-        let newResponse=""; 
-        for(let i=0; i < responseArray.length; i++)
-        {
-            if (i === 0 || i%2 !== 1) {
-                newResponse += responseArray[i];
-            }
-            else{
-                newResponse += '<b style="font-weight: 500;">' + responseArray[i] + '</b>';
 
-            }
-        }
-        let newResponse2 = newResponse.split("*").join("<br/>");
-        let newResponseArray = newResponse2.split(" ");
-        for(let i=0; i<newResponseArray.length;i++)
-        {
-            const nextword = newResponseArray[i];
-            delayPara(i,nextword," ");
+        let currentPrompt = prompt !== undefined ? prompt : input;
+
+        if (prompt === undefined) {
+            setPrevPrompts(prev => [...prev, input]);
         }
 
-        setLoading(false)
+        setRecentPrompt(currentPrompt);
+        const response = await runChat(currentPrompt);
+
+        // --- Logic ---
+
+        // bold
+        let boldResponse = response.replace(/\*\*(.*?)\*\*/g, '<b style="font-weight: 700;">$1</b>');
+
+        // bullett
+        let listResponse = boldResponse.replace(/^\s*\*(.*)/gm, '<br>• $1');
+
+        // next line
+        let finalResponse = listResponse.replace(/\n/g, '<br>');
+
+        let newResponseArray = finalResponse.split(" ");
+        for (let i = 0; i < newResponseArray.length; i++) {
+            const nextWord = newResponseArray[i];
+            delayPara(i, nextWord);
+        }
+
+        setLoading(false);
         setInput("");
-
-        await runChat(input);
     };
 
     const contextValue = {

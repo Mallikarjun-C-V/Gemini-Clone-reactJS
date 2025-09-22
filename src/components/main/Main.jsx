@@ -68,6 +68,7 @@ const main = () => {
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && input) {
                                     onSent();
+                                    setInput("");  
                                 }
                             }}
                             value={input}
@@ -77,7 +78,10 @@ const main = () => {
                         <div>
                             <img src={assets.gallery_icon} alt="" />
                             <img src={assets.mic_icon} alt="" />
-                            {input ? <img onClick={() => onSent()} src={assets.send_icon} alt="" /> : null}
+                            {input ? <img onClick={() => {
+                                onSent();
+                                setInput("");  
+                            }} src={assets.send_icon} alt="" /> : null}
                         </div>
                     </div>
                     <p className="bottom-info">

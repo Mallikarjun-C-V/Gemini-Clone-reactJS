@@ -2,7 +2,8 @@ import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
 
 const MODEL_NAME = "gemini-2.5-flash"; 
 
-const apiKey = ""; 
+const apiKey = import.meta.env.VITE_API_KEY;
+
 
 if (!apiKey) {
   throw new Error("❌ Missing GEMINI_API_KEY in environment variables.");

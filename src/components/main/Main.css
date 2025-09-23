@@ -5,6 +5,10 @@
     position: relative;
 }
 
+.z1{
+    cursor: pointer;
+}
+
 .main .nav{
     display: flex;
     align-items: center;

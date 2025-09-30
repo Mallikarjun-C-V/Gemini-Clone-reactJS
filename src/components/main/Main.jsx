@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext ,useEffect } from 'react'
 import './Main.css'
 import { assets } from '../../assets/assets'
 import { Context } from '../../context/Context'
@@ -6,6 +6,26 @@ import { Context } from '../../context/Context'
 const Main = ({ displayedName, animationClass }) => {
 
     const { onSent, recentPrompt, showResult, loading, resultData, setInput, input } = useContext(Context);
+
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                if (document.activeElement.tagName !== 'INPUT' &&
+                    document.activeElement.tagName !== 'TEXTAREA') {
+                    const inputElement = document.querySelector('.search-box input');
+                    if (inputElement) {
+                        inputElement.focus();
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyPress);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, []);
 
     return (
         <div className="main">

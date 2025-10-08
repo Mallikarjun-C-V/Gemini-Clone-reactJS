@@ -1,9 +1,14 @@
 # 🌌 Gemini Clone (React + Vite)
 
 A modern **ChatGPT-like clone** built with **React** and **Vite**, featuring a responsive sidebar, chat history, and sleek UI.  
-Deployed on **Vercel** for instant access!  
 
-[🔗 View Live Demo](https://gemini-clone-react-js-1.vercel.app)  
+---
+
+## 🌟 Live Demo
+
+# [https://gemini-clone-react-js-1.vercel.app](https://gemini-clone-react-js-1.vercel.app)  
+
+[![Visit Live Site](https://img.shields.io/badge/Visit%20Live%20Site-Gemini%20Clone-brightgreen?style=for-the-badge&logo=vercel&logoColor=white)](https://gemini-clone-react-js-1.vercel.app)
 
 ---
 
@@ -25,14 +30,6 @@ Deployed on **Vercel** for instant access!
 - **Context API** – Lightweight state management  
 - **CSS Modules** – Scoped styling  
 - **Vercel** – Hosting and deployment  
-
----
-
-## 🔗 Live Demo
-
-Click below to try it online:  
-
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000?style=for-the-badge&logo=vercel&logoColor=white)](https://gemini-clone-react-js-1.vercel.app)  
 
 ---
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Sidebar from './components/Sidebar/Sidebar';
+import Sidebar from './components/sidebar/Sidebar';
 import Main from './components/Main/Main';
 import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 import CursorTrail from './CursorTrail';

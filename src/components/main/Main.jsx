@@ -1,4 +1,4 @@
-import React, { useContext ,useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './Main.css'
 import { assets } from '../../assets/assets'
 import { Context } from '../../context/Context'
@@ -6,6 +6,12 @@ import { Context } from '../../context/Context'
 const Main = ({ displayedName, animationClass }) => {
 
     const { onSent, recentPrompt, showResult, loading, resultData, setInput, input } = useContext(Context);
+
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    useEffect(() => {
+        setIsLoaded(true);
+    }, []);
 
     useEffect(() => {
         const handleKeyPress = (e) => {
@@ -28,7 +34,7 @@ const Main = ({ displayedName, animationClass }) => {
     }, []);
 
     return (
-        <div className="main">
+        <div className={`main ${isLoaded ? 'loaded' : ''}`}>
             <div className="nav">
                 <p>Gemini</p>
                 <img className='z1' src={assets.user_icon} alt="" />

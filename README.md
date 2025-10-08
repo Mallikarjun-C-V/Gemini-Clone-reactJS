@@ -1,12 +1,40 @@
-# React + Vite
+# 🌌 Gemini Clone (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern **ChatGPT-like clone** built with **React** and **Vite**, featuring a responsive sidebar, chat history, and sleek UI.  
+Deployed on **Vercel** for instant access!  
 
-Currently, two official plugins are available:
+[🔗 View Live Demo](https://gemini-clone-react-js-1.vercel.app)  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🚀 Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 💬 Interactive chat interface  
+- 🗂️ Sidebar with **recent prompts** and **new chat** button  
+- ⚡ Fast, **Vite-powered development** with HMR  
+- 🛠️ Context API for **state management**  
+- 🎨 Clean and responsive UI design  
+- 🏷️ Easily extendable with more features  
+
+---
+
+## 📦 Technologies Used
+
+- **React** – Frontend UI library  
+- **Vite** – Blazing-fast build tool  
+- **Context API** – Lightweight state management  
+- **CSS Modules** – Scoped styling  
+- **Vercel** – Hosting and deployment  
+
+---
+
+## 🔗 Live Demo
+
+Click below to try it online:  
+
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000?style=for-the-badge&logo=vercel&logoColor=white)](https://gemini-clone-react-js-1.vercel.app)  
+
+---
+
+## 📁 Project Structure
+

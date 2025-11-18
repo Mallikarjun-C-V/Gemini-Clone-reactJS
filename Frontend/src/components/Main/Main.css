@@ -277,3 +277,21 @@
         display: none;
     }
 }
+
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.search-box input {
+  flex: 1;
+}
+
+/* small wrapper for icons + stt */
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

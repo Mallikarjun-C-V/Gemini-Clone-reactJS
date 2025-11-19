@@ -295,3 +295,112 @@
   align-items: center;
   gap: 0.5rem;
 }
+
+
+/* --- Existing CSS above --- */
+
+/* --- SIRI OVERLAY & ANIMATION --- */
+.siri-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px); /* Blurs the background content */
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.siri-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* The glowing orbs */
+.siri-orb, .siri-orb-2, .siri-orb-3 {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(8px);
+}
+
+/* Core Orb */
+.siri-orb {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #39efff, #0066ff);
+    animation: breathe 1.5s infinite ease-in-out alternate;
+    z-index: 3;
+    box-shadow: 0 0 20px rgba(57, 239, 255, 0.6);
+}
+
+/* Middle Orb */
+.siri-orb-2 {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, #ff00ea, #9d00ff);
+    animation: breathe 1.5s infinite ease-in-out alternate-reverse;
+    opacity: 0.7;
+    z-index: 2;
+}
+
+/* Outer Orb */
+.siri-orb-3 {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(45deg, #ffffff, #a8c0ff);
+    animation: pulse 2s infinite linear;
+    opacity: 0.4;
+    z-index: 1;
+}
+
+.siri-text {
+    color: white;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-top: 20px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.siri-timer {
+    color: #e3e3e3;
+    font-size: 18px;
+    margin-top: 8px;
+    font-family: monospace;
+}
+
+.siri-instruction {
+    color: #888;
+    font-size: 12px;
+    margin-top: 40px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Animations */
+@keyframes breathe {
+    0% { transform: scale(0.9); }
+    100% { transform: scale(1.1); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.8) rotate(0deg); opacity: 0.3; }
+    50% { transform: scale(1.2) rotate(180deg); opacity: 0.5; }
+    100% { transform: scale(0.8) rotate(360deg); opacity: 0.3; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

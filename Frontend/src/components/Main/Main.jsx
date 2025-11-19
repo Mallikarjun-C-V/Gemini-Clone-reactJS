@@ -8,6 +8,9 @@ const Main = ({ displayedName, animationClass }) => {
     const { onSent, recentPrompt, showResult, loading, resultData, setInput, input } = useContext(Context);
     const [isLoaded, setIsLoaded] = useState(false);
 
+    // --- NEW: State for word-by-word typing effect ---
+    const [displayedText, setDisplayedText] = useState("");
+
     // --- Voice Recognition State ---
     const [isListening, setIsListening] = useState(false);
     const [timer, setTimer] = useState(0);
@@ -17,6 +20,30 @@ const Main = ({ displayedName, animationClass }) => {
     useEffect(() => {
         setIsLoaded(true);
     }, []);
+
+    // --- NEW: Typing Effect Logic ---
+    useEffect(() => {
+        // When loading is false and we have data, start the typing effect
+        if (!loading && resultData) {
+            setDisplayedText(""); // Reset display text
+            const words = resultData.split(" "); // Split the response into an array of words
+            let i = 0;
+
+            const interval = setInterval(() => {
+                if (i < words.length) {
+                    // Add one word at a time with a space
+                    setDisplayedText((prev) => prev + words[i] + " ");
+                    i++;
+                } else {
+                    clearInterval(interval); // Stop when all words are displayed
+                }
+            }, 20); // Delay in milliseconds (adjust for speed)
+
+            // Cleanup to stop the loop if component unmounts or updates
+            return () => clearInterval(interval);
+        }
+    }, [resultData, loading]);
+
 
     // --- Keyboard Shortcut Logic ---
     useEffect(() => {
@@ -156,7 +183,8 @@ const Main = ({ displayedName, animationClass }) => {
                                 </div>
                             ) : (
                                 <div className="markdown-output">
-                                    <ReactMarkdown>{resultData}</ReactMarkdown>
+                                    {/* Modified to use the displayedText state */}
+                                    <ReactMarkdown>{displayedText}</ReactMarkdown>
                                 </div>
                             )}
                         </div>

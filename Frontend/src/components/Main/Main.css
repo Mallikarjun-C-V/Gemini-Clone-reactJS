@@ -297,110 +297,149 @@
 }
 
 
-/* --- Existing CSS above --- */
+/* --- NEW VOICE ANIMATION UI (GEMINI STYLE) --- */
 
-/* --- SIRI OVERLAY & ANIMATION --- */
-.siri-overlay {
+.voice-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(15px); /* Blurs the background content */
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* CHANGED: Reduced from 0.85 to 0.1 (10% opacity) */
+    backdrop-filter: blur(8px); /* CHANGED: Reduced from 12px to 3px */
     z-index: 9999;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    animation: fadeIn 0.4s ease-out;
     cursor: pointer;
-    animation: fadeIn 0.3s ease-in-out;
 }
 
-.siri-container {
+.voice-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: 100%;
+}
+
+/* The Fluid Blob Animation */
+.blob-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
 }
 
-/* The glowing orbs */
-.siri-orb, .siri-orb-2, .siri-orb-3 {
+.blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(8px);
+    filter: blur(40px);
+    mix-blend-mode: screen; /* Creates the white glow when colors overlap */
+    animation: moveBlob 4s infinite ease-in-out alternate;
 }
 
-/* Core Orb */
-.siri-orb {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(45deg, #39efff, #0066ff);
-    animation: breathe 1.5s infinite ease-in-out alternate;
-    z-index: 3;
-    box-shadow: 0 0 20px rgba(57, 239, 255, 0.6);
+.blob-blue {
+    width: 150px;
+    height: 150px;
+    background: #4285f4;
+    top: 10px;
+    left: 20px;
+    animation-delay: 0s;
 }
 
-/* Middle Orb */
-.siri-orb-2 {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(45deg, #ff00ea, #9d00ff);
-    animation: breathe 1.5s infinite ease-in-out alternate-reverse;
-    opacity: 0.7;
-    z-index: 2;
+.blob-red {
+    width: 140px;
+    height: 140px;
+    background: #ea4335;
+    bottom: 10px;
+    right: 20px;
+    animation-delay: 1s;
 }
 
-/* Outer Orb */
-.siri-orb-3 {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(45deg, #ffffff, #a8c0ff);
-    animation: pulse 2s infinite linear;
-    opacity: 0.4;
-    z-index: 1;
+.blob-yellow {
+    width: 120px;
+    height: 120px;
+    background: #fbbc04;
+    bottom: -20px;
+    left: 30px;
+    animation-delay: 2s;
 }
 
-.siri-text {
-    color: white;
-    font-size: 24px;
+@keyframes moveBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(20px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+.voice-status h2 {
+    color: rgb(88, 88, 88);
+    font-size: 28px;
     font-weight: 500;
-    letter-spacing: 1px;
-    margin-top: 20px;
-    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.5px;
+    margin: 0;
+    animation: pulseText 2s infinite;
 }
 
-.siri-timer {
-    color: #e3e3e3;
+.voice-status p {
+    color: rgb(88, 88, 88); /* Light blue text */
     font-size: 18px;
-    margin-top: 8px;
+    margin-top: 5px;
     font-family: monospace;
+    text-align: center;
 }
 
-.siri-instruction {
-    color: #888;
-    font-size: 12px;
-    margin-top: 40px;
+/* Audio Wave Bars */
+.voice-wave {
+    display: flex;
+    gap: 6px;
+    height: 30px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.voice-wave span {
+    display: block;
+    width: 4px;
+    background: rgb(88, 88, 88);
+    border-radius: 10px;
+    animation: soundWave 1s infinite ease-in-out;
+}
+
+.voice-wave span:nth-child(1) { height: 10px; animation-delay: 0.1s; }
+.voice-wave span:nth-child(2) { height: 25px; animation-delay: 0.2s; }
+.voice-wave span:nth-child(3) { height: 15px; animation-delay: 0.3s; }
+.voice-wave span:nth-child(4) { height: 25px; animation-delay: 0.4s; }
+.voice-wave span:nth-child(5) { height: 10px; animation-delay: 0.5s; }
+
+@keyframes soundWave {
+    0%, 100% { height: 10px; opacity: 0.5; }
+    50% { height: 30px; opacity: 1; }
+}
+
+.tap-to-stop {
+    position: absolute;
+    bottom: 50px;
+    color: rgb(70, 70, 70);
+    font-size: 20px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* Animations */
-@keyframes breathe {
-    0% { transform: scale(0.9); }
-    100% { transform: scale(1.1); }
-}
-
-@keyframes pulse {
-    0% { transform: scale(0.8) rotate(0deg); opacity: 0.3; }
-    50% { transform: scale(1.2) rotate(180deg); opacity: 0.5; }
-    100% { transform: scale(0.8) rotate(360deg); opacity: 0.3; }
+    letter-spacing: 1px;
 }
 
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+@keyframes pulseText {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
 }

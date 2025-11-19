@@ -45,8 +45,8 @@ const Main = ({ displayedName, animationClass }) => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognitionRef.current = new SpeechRecognition();
 
-        recognitionRef.current.continuous = true;     // Keep listening even if user pauses
-        recognitionRef.current.interimResults = true; // Real-time typing
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
 
         recognitionRef.current.onstart = () => {
             setIsListening(true);
@@ -58,27 +58,22 @@ const Main = ({ displayedName, animationClass }) => {
 
         recognitionRef.current.onresult = (event) => {
             let finalTranscript = '';
-            // Loop through results to construct the sentence
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const transcript = event.results[i][0].transcript;
                 finalTranscript += transcript;
             }
-            // Update Input Context in Real-Time
             setInput(prev => finalTranscript);
         };
 
         recognitionRef.current.onerror = (event) => {
             console.error("Speech recognition error", event.error);
-
             if (event.error === 'network') {
-                alert("Network Error: Please check your internet connection. This feature requires being online.");
+                alert("Network Error: Please check your internet connection.");
             } else if (event.error === 'not-allowed') {
-                alert("Microphone blocked. Please allow microphone access in your browser settings.");
+                alert("Microphone blocked.");
             } else if (event.error === 'no-speech') {
-                alert("nothing")
                 return;
             }
-
             stopListening();
         };
 
@@ -182,44 +177,59 @@ const Main = ({ displayedName, animationClass }) => {
                             type="text"
                             placeholder="Enter a prompt here"
                         />
-                        <div>
-                            <img src={assets.gallery_icon} alt="" />
-                            {/* Updated Mic Icon with Click Handler */}
+
+                        <div className="search-actions">
                             <img
                                 src={assets.mic_icon}
                                 alt=""
                                 onClick={startListening}
                                 style={{ cursor: 'pointer' }}
                             />
-                            {input && (
-                                <img
-                                    onClick={() => {
+
+                            {/* Always visible send icon but tinted based on input */}
+                            <img
+                                onClick={() => {
+                                    if (input) {
                                         onSent();
                                         setInput("");
-                                    }}
-                                    src={assets.send_icon}
-                                    alt=""
-                                />
-                            )}
+                                    }
+                                }}
+                                src={assets.send_icon}
+                                alt="send-icon"
+                                style={{
+                                    cursor: input ? "pointer" : "not-allowed",
+                                    filter: input ? "none" : "grayscale(100%) opacity(40%)"
+                                }}
+                            />
                         </div>
                     </div>
+
                     <p className="bottom-info">
                         Gemini may display inaccurate info, including about people, so double check its responses.
                     </p>
                 </div>
+
             </div>
 
-            {/* --- SIRI ANIMATION OVERLAY --- */}
+            {/* --- UPGRADED VOICE ANIMATION OVERLAY --- */}
             {isListening && (
-                <div className="siri-overlay" onClick={stopListening}>
-                    <div className="siri-container">
-                        <div className="siri-orb"></div>
-                        <div className="siri-orb-2"></div>
-                        <div className="siri-orb-3"></div>
+                <div className="voice-overlay" onClick={stopListening}>
+                    <div className="voice-content">
+                        <div className="blob-container">
+                            <div className="blob blob-blue"></div>
+                            <div className="blob blob-red"></div>
+                            <div className="blob blob-yellow"></div>
+                            <div className="blob-blur-overlay"></div>
+                        </div>
+                        <div className="voice-status">
+                            <h2>Listening...</h2>
+                            <p>{formatTime(timer)}</p>
+                        </div>
+                        <div className="voice-wave">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <p className="tap-to-stop">Tap anywhere to stop</p>
                     </div>
-                    <div className="siri-text">Listening...</div>
-                    <div className="siri-timer">{formatTime(timer)}</div>
-                    <div className="siri-instruction">Tap anywhere to stop</div>
                 </div>
             )}
         </div>

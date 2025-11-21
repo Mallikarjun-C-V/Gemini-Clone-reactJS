@@ -525,3 +525,102 @@
 .tts-btn.stop {
     border-color: #ffbebe;
 }
+
+/* ----------------------------
+   Action row: icons & layout
+   ---------------------------- */
+
+.action-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 14px;
+    margin-bottom: 6px;
+}
+
+/* simple button reset + minimal style */
+.action-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.12s ease, transform 0.08s ease;
+}
+
+/* subtle hover - very minimal */
+.action-btn:hover {
+    background: rgba(0,0,0,0.04);
+    transform: translateY(-1px);
+}
+
+/* Disabled state for refresh while refreshing */
+.action-btn[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* When active, fill SVG inner color (black). stroke remains black always */
+.action-btn.active svg path,
+.action-btn.active svg rect,
+.action-btn.active svg circle {
+    fill: #000 !important;
+}
+
+/* Default SVG styles: stroke black, no fill */
+.action-row svg {
+    display: block;
+}
+
+/* ensure icons are visually similar weight */
+.action-row svg path,
+.action-row svg rect,
+.action-row svg circle {
+    stroke: #000;
+    stroke-width: 1;
+    fill: none;
+}
+
+/* Slightly smaller hit area on mobile kept minimal */
+@media (max-width: 480px) {
+    .action-btn {
+        padding: 8px;
+    }
+}
+
+/* ----------------------------
+   Gemini-like centered notification
+   ---------------------------- */
+
+/* This is the small, simple message that appears centered horizontally */
+/* and about 50px from the top. It's intentionally minimal and matches a modern aesthetic. */
+.gemini-notice {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 50px; /* ~50px below top */
+    background: #111; /* dark pill like Gemini */
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 6px 18px rgba(16,16,16,0.14);
+    z-index: 120;
+    pointer-events: none;
+    opacity: 0.98;
+}
+
+/* small responsive tweak */
+@media (max-width: 420px) {
+    .gemini-notice {
+        top: 40px;
+        font-size: 12px;
+        padding: 7px 12px;
+    }
+}

@@ -11,8 +11,17 @@ const Main = ({ displayedName, animationClass }) => {
     // Typing effect
     const [displayedText, setDisplayedText] = useState("");
 
-    // TTS State
+    // TTS State (no auto speak)
     const [isSpeaking, setIsSpeaking] = useState(false);
+
+    // Action buttons state
+    const [liked, setLiked] = useState(false);
+    const [disliked, setDisliked] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Small Gemini-like notification (appears center, ~50px from top)
+    const [notice, setNotice] = useState({ visible: false, text: '' });
+    const noticeTimerRef = useRef(null);
 
     // Voice Recognition
     const [isListening, setIsListening] = useState(false);
@@ -20,36 +29,20 @@ const Main = ({ displayedName, animationClass }) => {
     const recognitionRef = useRef(null);
     const timerIntervalRef = useRef(null);
 
-    useEffect(() => setIsLoaded(true), []);
-
-    // --- Keyboard Shortcut Logic ---
     useEffect(() => {
-        const handleKeyPress = (e) => {
-            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-                if (document.activeElement.tagName !== 'INPUT' &&
-                    document.activeElement.tagName !== 'TEXTAREA') {
-                    const inputElement = document.querySelector('.search-box input');
-                    if (inputElement) {
-                        inputElement.focus();
-                    }
-                }
-            }
-        };
-        document.addEventListener('keydown', handleKeyPress);
-        return () => document.removeEventListener('keydown', handleKeyPress);
+        setIsLoaded(true);
     }, []);
 
-
-    /* ───────────────────────────────
+    /* ----------------------------------
        TEXT-TO-SPEECH (NO AUTO SPEAK)
-    ───────────────────────────────*/
+    ------------------------------------*/
     const speakText = (text) => {
         if (!window.speechSynthesis) {
             alert("Speech Synthesis not supported in this browser.");
             return;
         }
 
-        window.speechSynthesis.cancel(); // stop any existing speech
+        window.speechSynthesis.cancel();
 
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = "en-US";
@@ -67,9 +60,9 @@ const Main = ({ displayedName, animationClass }) => {
         setIsSpeaking(false);
     };
 
-    /* ───────────────────────────────
+    /* ----------------------------------
        TYPING EFFECT
-    ───────────────────────────────*/
+    ------------------------------------*/
     useEffect(() => {
         if (!loading && resultData) {
             setDisplayedText("");
@@ -89,9 +82,9 @@ const Main = ({ displayedName, animationClass }) => {
         }
     }, [resultData, loading]);
 
-    /* ───────────────────────────────
+    /* ----------------------------------
        VOICE INPUT (RECOGNITION)
-    ───────────────────────────────*/
+    ------------------------------------*/
     const startListening = () => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -138,9 +131,114 @@ const Main = ({ displayedName, animationClass }) => {
         return `${m}:${s < 10 ? "0" : ""}${s}`;
     };
 
-    /* ───────────────────────────────
-       UI RENDER
-    ───────────────────────────────*/
+    /* ----------------------------------
+       ACTIONS: like / dislike / refresh / copy / dots
+    ------------------------------------*/
+    const handleLike = () => {
+        setLiked(prev => {
+            const next = !prev;
+            // if liking, clear dislike
+            if (next && disliked) setDisliked(false);
+            return next;
+        });
+    };
+
+    const handleDislike = () => {
+        setDisliked(prev => {
+            const next = !prev;
+            // if disliking, clear like
+            if (next && liked) setLiked(false);
+            return next;
+        });
+    };
+
+    const showNotice = (text) => {
+        // Clear existing
+        if (noticeTimerRef.current) {
+            clearTimeout(noticeTimerRef.current);
+            noticeTimerRef.current = null;
+        }
+        setNotice({ visible: true, text });
+        noticeTimerRef.current = setTimeout(() => {
+            setNotice({ visible: false, text: '' });
+            noticeTimerRef.current = null;
+        }, 1600);
+    };
+
+    const handleCopy = async () => {
+        try {
+            if (!resultData) return;
+            await navigator.clipboard.writeText(resultData);
+            showNotice('Text copied to clipboard');
+        } catch (err) {
+            showNotice('Unable to copy');
+            console.error('copy error', err);
+        }
+    };
+
+    const handleRefresh = async () => {
+        // disable while refreshing
+        if (isRefreshing) return;
+        if (!recentPrompt) {
+            showNotice('Nothing to refresh');
+            return;
+        }
+
+        setIsRefreshing(true);
+
+        // Put recentPrompt into input then call onSent()
+        // onSent is expected to send the input to the backend
+        setInput(recentPrompt);
+        try {
+            // If onSent is synchronous or handles its own async flow this will work.
+            onSent();
+        } catch (err) {
+            console.error('refresh send failed', err);
+        } finally {
+            // clear input after sending (keeps behaviour consistent)
+            setInput('');
+            // small delay to avoid rapid clicks
+            setTimeout(() => setIsRefreshing(false), 800);
+        }
+    };
+
+    const handleDots = () => {
+        showNotice('No more features available');
+    };
+
+    /* ----------------------------------
+       AUTOFOCUS ON TYPING (previous feature)
+    ------------------------------------*/
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                const activeTag = document.activeElement.tagName;
+                if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
+                    const inputBox = document.querySelector('.search-box input');
+                    if (inputBox) {
+                        inputBox.focus();
+                    }
+                }
+            }
+        };
+        document.addEventListener('keydown', handleKeyPress);
+        return () => document.removeEventListener('keydown', handleKeyPress);
+    }, []);
+
+    /* ----------------------------------
+       CLEANUP notice timer on unmount
+    ------------------------------------*/
+    useEffect(() => {
+        return () => {
+            if (noticeTimerRef.current) {
+                clearTimeout(noticeTimerRef.current);
+            }
+        };
+    }, []);
+
+    /* ----------------------------------
+       RENDER
+    ------------------------------------*/
     return (
         <div className={`main ${isLoaded ? 'loaded' : ''}`}>
             <div className="nav">
@@ -149,7 +247,6 @@ const Main = ({ displayedName, animationClass }) => {
             </div>
 
             <div className="main-container">
-
                 {!showResult ? (
                     <>
                         <div className="greet">
@@ -203,13 +300,65 @@ const Main = ({ displayedName, animationClass }) => {
                                 <div className="markdown-output">
                                     <ReactMarkdown>{displayedText}</ReactMarkdown>
 
-                                    {/* SPEAK + STOP BUTTONS */}
+                                    {/* ACTION ROW (LIKE / DISLIKE / REFRESH / COPY / DOTS) */}
+                                    <div className="action-row">
+
+                                        {/* LIKE */}
+                                        <button
+                                            className={`action-btn ${liked ? "active" : ""}`}
+                                            onClick={handleLike}
+                                            title="Like"
+                                        >
+                                            <i className="fa-solid fa-thumbs-up"></i>
+                                        </button>
+
+                                        {/* DISLIKE */}
+                                        <button
+                                            className={`action-btn ${disliked ? "active" : ""}`}
+                                            onClick={handleDislike}
+                                            title="Dislike"
+                                        >
+                                            <i className="fa-solid fa-thumbs-down"></i>
+                                        </button>
+
+                                        {/* REFRESH */}
+                                        <button
+                                            className="action-btn"
+                                            onClick={handleRefresh}
+                                            disabled={isRefreshing || loading}
+                                            title="Refresh"
+                                        >
+                                            <i className="fa-solid fa-rotate-right"></i>
+                                        </button>
+
+                                        {/* COPY */}
+                                        <button
+                                            className="action-btn"
+                                            onClick={handleCopy}
+                                            title="Copy"
+                                        >
+                                            <i className="fa-solid fa-copy"></i>
+                                        </button>
+
+                                        {/* THREE DOTS (VERTICAL) */}
+                                        <button
+                                            className="action-btn"
+                                            onClick={handleDots}
+                                            title="More Options"
+                                        >
+                                            <i className="fa-solid fa-ellipsis-vertical"></i>
+                                        </button>
+
+                                    </div>
+
+
+                                    {/* TTS Controls (Speak / Stop) */}
                                     <div className="tts-controls">
                                         <button
                                             className="tts-btn speak"
                                             onClick={() => speakText(resultData)}
                                         >
-                                            🔊 Speak Aloud
+                                            🔊 Speak
                                         </button>
 
                                         {isSpeaking && (
@@ -271,7 +420,6 @@ const Main = ({ displayedName, animationClass }) => {
                         Gemini may display inaccurate info, including about people, so double check its responses.
                     </p>
                 </div>
-
             </div>
 
             {/* LISTENING OVERLAY */}
@@ -281,6 +429,13 @@ const Main = ({ displayedName, animationClass }) => {
                         <h2>Listening...</h2>
                         <p>{formatTime(timer)}</p>
                     </div>
+                </div>
+            )}
+
+            {/* Gemini-like small notification (not a third-party toast) */}
+            {notice.visible && (
+                <div className="gemini-notice" role="status" aria-live="polite">
+                    {notice.text}
                 </div>
             )}
         </div>

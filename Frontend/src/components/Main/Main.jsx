@@ -8,70 +8,81 @@ const Main = ({ displayedName, animationClass }) => {
     const { onSent, recentPrompt, showResult, loading, resultData, setInput, input } = useContext(Context);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // --- NEW: State for word-by-word typing effect ---
+    // Typing effect
     const [displayedText, setDisplayedText] = useState("");
 
-    // --- Voice Recognition State ---
+    // TTS State
+    const [isSpeaking, setIsSpeaking] = useState(false);
+
+    // Voice Recognition
     const [isListening, setIsListening] = useState(false);
     const [timer, setTimer] = useState(0);
     const recognitionRef = useRef(null);
     const timerIntervalRef = useRef(null);
 
-    useEffect(() => {
-        setIsLoaded(true);
-    }, []);
+    useEffect(() => setIsLoaded(true), []);
 
-    // --- NEW: Typing Effect Logic ---
+    /* ───────────────────────────────
+       TEXT-TO-SPEECH (NO AUTO SPEAK)
+    ───────────────────────────────*/
+    const speakText = (text) => {
+        if (!window.speechSynthesis) {
+            alert("Speech Synthesis not supported in this browser.");
+            return;
+        }
+
+        window.speechSynthesis.cancel(); // stop any existing speech
+
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = "en-US";
+        utter.rate = 1;
+        utter.pitch = 1;
+
+        utter.onstart = () => setIsSpeaking(true);
+        utter.onend = () => setIsSpeaking(false);
+
+        window.speechSynthesis.speak(utter);
+    };
+
+    const stopSpeaking = () => {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+    };
+
+    /* ───────────────────────────────
+       TYPING EFFECT
+    ───────────────────────────────*/
     useEffect(() => {
-        // When loading is false and we have data, start the typing effect
         if (!loading && resultData) {
-            setDisplayedText(""); // Reset display text
-            const words = resultData.split(" "); // Split the response into an array of words
+            setDisplayedText("");
+            const words = resultData.split(" ");
             let i = 0;
 
             const interval = setInterval(() => {
                 if (i < words.length) {
-                    // Add one word at a time with a space
-                    setDisplayedText((prev) => prev + words[i] + " ");
+                    setDisplayedText(prev => prev + words[i] + " ");
                     i++;
                 } else {
-                    clearInterval(interval); // Stop when all words are displayed
+                    clearInterval(interval);
                 }
-            }, 20); // Delay in milliseconds (adjust for speed)
+            }, 20);
 
-            // Cleanup to stop the loop if component unmounts or updates
             return () => clearInterval(interval);
         }
     }, [resultData, loading]);
 
-
-    // --- Keyboard Shortcut Logic ---
-    useEffect(() => {
-        const handleKeyPress = (e) => {
-            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-                if (document.activeElement.tagName !== 'INPUT' &&
-                    document.activeElement.tagName !== 'TEXTAREA') {
-                    const inputElement = document.querySelector('.search-box input');
-                    if (inputElement) {
-                        inputElement.focus();
-                    }
-                }
-            }
-        };
-        document.addEventListener('keydown', handleKeyPress);
-        return () => document.removeEventListener('keydown', handleKeyPress);
-    }, []);
-
-    // --- Voice Logic (Frontend Only) ---
+    /* ───────────────────────────────
+       VOICE INPUT (RECOGNITION)
+    ───────────────────────────────*/
     const startListening = () => {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert("Your browser does not support Speech Recognition. Try Chrome.");
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert("Your browser does not support Speech Recognition.");
             return;
         }
 
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognitionRef.current = new SpeechRecognition();
-
         recognitionRef.current.continuous = true;
         recognitionRef.current.interimResults = true;
 
@@ -79,53 +90,39 @@ const Main = ({ displayedName, animationClass }) => {
             setIsListening(true);
             setTimer(0);
             timerIntervalRef.current = setInterval(() => {
-                setTimer((prev) => prev + 1);
+                setTimer(prev => prev + 1);
             }, 1000);
         };
 
         recognitionRef.current.onresult = (event) => {
-            let finalTranscript = '';
+            let text = "";
             for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                finalTranscript += transcript;
+                text += event.results[i][0].transcript;
             }
-            setInput(prev => finalTranscript);
+            setInput(text);
         };
 
-        recognitionRef.current.onerror = (event) => {
-            console.error("Speech recognition error", event.error);
-            if (event.error === 'network') {
-                alert("Network Error: Please check your internet connection.");
-            } else if (event.error === 'not-allowed') {
-                alert("Microphone blocked.");
-            } else if (event.error === 'no-speech') {
-                return;
-            }
-            stopListening();
-        };
-
-        recognitionRef.current.onend = () => {
-            stopListening();
-        };
+        recognitionRef.current.onerror = () => stopListening();
+        recognitionRef.current.onend = () => stopListening();
 
         recognitionRef.current.start();
     };
 
     const stopListening = () => {
-        if (recognitionRef.current) {
-            recognitionRef.current.stop();
-        }
-        setIsListening(false);
+        if (recognitionRef.current) recognitionRef.current.stop();
         clearInterval(timerIntervalRef.current);
+        setIsListening(false);
     };
 
-    // Format time for UI (mm:ss)
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    const formatTime = (sec) => {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${m}:${s < 10 ? "0" : ""}${s}`;
     };
 
+    /* ───────────────────────────────
+       UI RENDER
+    ───────────────────────────────*/
     return (
         <div className={`main ${isLoaded ? 'loaded' : ''}`}>
             <div className="nav">
@@ -134,6 +131,7 @@ const Main = ({ displayedName, animationClass }) => {
             </div>
 
             <div className="main-container">
+
                 {!showResult ? (
                     <>
                         <div className="greet">
@@ -175,16 +173,36 @@ const Main = ({ displayedName, animationClass }) => {
                             <img src={assets.user_icon} alt="" />
                             <p>{recentPrompt}</p>
                         </div>
+
                         <div className="result-data">
                             <img src={assets.gemini_icon} alt="" />
+
                             {loading ? (
                                 <div className="loader">
                                     <hr /><hr /><hr />
                                 </div>
                             ) : (
                                 <div className="markdown-output">
-                                    {/* Modified to use the displayedText state */}
                                     <ReactMarkdown>{displayedText}</ReactMarkdown>
+
+                                    {/* SPEAK + STOP BUTTONS */}
+                                    <div className="tts-controls">
+                                        <button
+                                            className="tts-btn speak"
+                                            onClick={() => speakText(resultData)}
+                                        >
+                                            🔊 Speak Aloud
+                                        </button>
+
+                                        {isSpeaking && (
+                                            <button
+                                                className="tts-btn stop"
+                                                onClick={stopSpeaking}
+                                            >
+                                                ⛔ Stop
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -214,7 +232,6 @@ const Main = ({ displayedName, animationClass }) => {
                                 style={{ cursor: 'pointer' }}
                             />
 
-                            {/* Always visible send icon but tinted based on input */}
                             <img
                                 onClick={() => {
                                     if (input) {
@@ -239,24 +256,12 @@ const Main = ({ displayedName, animationClass }) => {
 
             </div>
 
-            {/* --- UPGRADED VOICE ANIMATION OVERLAY --- */}
+            {/* LISTENING OVERLAY */}
             {isListening && (
                 <div className="voice-overlay" onClick={stopListening}>
                     <div className="voice-content">
-                        <div className="blob-container">
-                            <div className="blob blob-blue"></div>
-                            <div className="blob blob-red"></div>
-                            <div className="blob blob-yellow"></div>
-                            <div className="blob-blur-overlay"></div>
-                        </div>
-                        <div className="voice-status">
-                            <h2>Listening...</h2>
-                            <p>{formatTime(timer)}</p>
-                        </div>
-                        <div className="voice-wave">
-                            <span></span><span></span><span></span><span></span><span></span>
-                        </div>
-                        <p className="tap-to-stop">Tap anywhere to stop</p>
+                        <h2>Listening...</h2>
+                        <p>{formatTime(timer)}</p>
                     </div>
                 </div>
             )}

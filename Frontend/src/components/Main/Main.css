@@ -443,3 +443,85 @@
     50% { opacity: 1; }
     100% { opacity: 0.8; }
 }
+
+.action-bar {
+    margin-top: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.action-btn {
+    font-size: 20px;
+    background: #f4f4f4;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+}
+
+.action-btn.active {
+    background: #cde2ff;
+    border-color: #7bb2ff;
+}
+
+.three-dot-wrapper {
+    position: relative;
+}
+
+.three-dot-menu {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.15);
+    z-index: 10;
+}
+
+.three-dot-menu p {
+    margin: 0;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.three-dot-menu p:hover {
+    background: #f5f5f5;
+}
+
+
+
+/* ───────────────────────────────
+   TTS: Speak / Stop Buttons
+────────────────────────────────*/
+.tts-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.tts-btn {
+    padding: 4px 7px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #dcdcdc;
+    background: #ffffff;
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+
+/* Hover effect but very soft */
+.tts-btn:hover {
+    background: #f3f3f3;
+}
+
+/* Slight color hint to differentiate but still minimal */
+.tts-btn.speak {
+    border-color: #b8c9ff;
+}
+
+.tts-btn.stop {
+    border-color: #ffbebe;
+}

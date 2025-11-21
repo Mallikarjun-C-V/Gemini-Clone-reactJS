@@ -624,3 +624,36 @@
         padding: 7px 12px;
     }
 }
+
+.action-btn i {
+    font-size: 20px;
+    color: #000;
+}
+
+.action-btn.active i {
+    color: #000;
+}
+
+
+
+.action-btn i {
+    transition: 0.2s ease;
+}
+
+
+.copy-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.copy-icon-wrapper.fade-out {
+    opacity: 0;
+    transform: scale(0.75);
+}
+
+.copy-icon-wrapper.fade-in {
+    opacity: 1;
+    transform: scale(1);
+}

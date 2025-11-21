@@ -18,6 +18,8 @@ const Main = ({ displayedName, animationClass }) => {
     const [liked, setLiked] = useState(false);
     const [disliked, setDisliked] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const [copyAnim, setCopyAnim] = useState("fade-in");
 
     // Small Gemini-like notification (appears center, ~50px from top)
     const [notice, setNotice] = useState({ visible: false, text: '' });
@@ -168,13 +170,35 @@ const Main = ({ displayedName, animationClass }) => {
     const handleCopy = async () => {
         try {
             if (!resultData) return;
-            await navigator.clipboard.writeText(resultData);
-            showNotice('Text copied to clipboard');
+
+            navigator.clipboard.writeText(resultData);
+
+            // fade out icon
+            setCopyAnim("fade-out");
+
+            setTimeout(() => {
+                // switch icon + fade in
+                setCopied(true);
+                setCopyAnim("fade-in");
+            }, 200);
+
+            setTimeout(() => {
+                // fade out again
+                setCopyAnim("fade-out");
+            }, 1800);
+
+            setTimeout(() => {
+                // revert icon + fade in
+                setCopied(false);
+                setCopyAnim("fade-in");
+            }, 2000);
+
         } catch (err) {
-            showNotice('Unable to copy');
-            console.error('copy error', err);
+            console.error("Copy failed", err);
         }
     };
+
+
 
     const handleRefresh = async () => {
         // disable while refreshing
@@ -305,21 +329,19 @@ const Main = ({ displayedName, animationClass }) => {
 
                                         {/* LIKE */}
                                         <button
-                                            className={`action-btn ${liked ? "active" : ""}`}
+                                            className="action-btn"
                                             onClick={handleLike}
-                                            title="Like"
                                         >
-                                            <i className="fa-solid fa-thumbs-up"></i>
+                                            <i className={liked ? "fa-solid fa-thumbs-up" : "fa-regular fa-thumbs-up"}></i>
                                         </button>
 
-                                        {/* DISLIKE */}
                                         <button
-                                            className={`action-btn ${disliked ? "active" : ""}`}
+                                            className="action-btn"
                                             onClick={handleDislike}
-                                            title="Dislike"
                                         >
-                                            <i className="fa-solid fa-thumbs-down"></i>
+                                            <i className={disliked ? "fa-solid fa-thumbs-down" : "fa-regular fa-thumbs-down"}></i>
                                         </button>
+
 
                                         {/* REFRESH */}
                                         <button
@@ -337,8 +359,15 @@ const Main = ({ displayedName, animationClass }) => {
                                             onClick={handleCopy}
                                             title="Copy"
                                         >
-                                            <i className="fa-solid fa-copy"></i>
+                                            <span className={`copy-icon-wrapper ${copyAnim}`}>
+                                                {copied ? (
+                                                    <i className="fa-solid fa-check" style={{ color: "green" }}></i>
+                                                ) : (
+                                                    <i className="fa-solid fa-copy"></i>
+                                                )}
+                                            </span>
                                         </button>
+
 
                                         {/* THREE DOTS (VERTICAL) */}
                                         <button

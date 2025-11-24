@@ -231,7 +231,6 @@ const Main = ({ displayedName, animationClass }) => {
     };
 
     const handleRefresh = async () => {
-        // disable while refreshing
         if (isRefreshing) return;
         if (!recentPrompt) {
             showNotice('Nothing to refresh');
@@ -240,21 +239,19 @@ const Main = ({ displayedName, animationClass }) => {
 
         setIsRefreshing(true);
 
-        // Put recentPrompt into input then call onSent()
-        // onSent is expected to send the input to the backend
-        setInput(recentPrompt);
         try {
-            // If onSent is synchronous or handles its own async flow this will work.
-            onSent();
+            // 🔥 FIX: send the exact same prompt again
+            await onSent(recentPrompt);
+
         } catch (err) {
             console.error('refresh send failed', err);
+
         } finally {
-            // clear input after sending (keeps behaviour consistent)
-            setInput('');
-            // small delay to avoid rapid clicks
+            // small timeout to avoid rapid clicks
             setTimeout(() => setIsRefreshing(false), 800);
         }
     };
+
 
     const handleDots = () => {
         showNotice('No more features available');
@@ -496,7 +493,7 @@ const Main = ({ displayedName, animationClass }) => {
                                         onChange={handleImageUpload}
                                     />
                                     <img
-                                        src={assets.upload_icon}
+                                        src={assets.gallery_icon}
                                         alt="upload"
                                         style={{ cursor: 'pointer', width: 22 }}
                                     />

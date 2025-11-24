@@ -1,15 +1,13 @@
 import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
 
-const MODEL_NAME = "gemini-2.5-flash"; 
-
+const MODEL_NAME = "gemini-2.5-flash";
 const apiKey = import.meta.env.VITE_API_KEY;
 
-
 if (!apiKey) {
-  throw new Error("❌ Missing GEMINI_API_KEY in environment variables.");
+  throw new Error("❌ Missing GEMINI_API_KEY");
 }
 
-async function runChat(prompt) {
+async function runChat(prompt, base64Image = null, mimeType = null) {
   try {
     const ai = new GoogleGenAI({ apiKey });
 
@@ -20,11 +18,20 @@ async function runChat(prompt) {
       [HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT]: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     };
 
+    const parts = [{ text: prompt }];
+
+    if (base64Image) {
+      parts.push({
+        inlineData: {
+          data: base64Image,
+          mimeType
+        }
+      });
+    }
+
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
-      contents: [
-        { role: "user", parts: [{ text: prompt }] },
-      ],
+      contents: [{ role: "user", parts }],
       safetySettings,
       temperature: 0.9,
       topK: 1,
@@ -32,10 +39,9 @@ async function runChat(prompt) {
       maxOutputTokens: 2048,
     });
 
-    console.log(response.text ?? "⚠️ No response text");
     return response.text;
   } catch (err) {
-    console.error("❌ Gemini API Error:", err);
+    console.error("Gemini Error:", err);
     return null;
   }
 }

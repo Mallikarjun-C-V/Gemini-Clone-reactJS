@@ -5,7 +5,23 @@ import { Context } from '../../context/Context';
 import ReactMarkdown from "react-markdown";
 
 const Main = ({ displayedName, animationClass }) => {
-    const { onSent, recentPrompt, showResult, loading, resultData, setInput, input } = useContext(Context);
+    const {
+        onSent,
+        recentPrompt,
+        showResult,
+        loading,
+        resultData,
+        setInput,
+        input,
+        // image-related values coming from Context
+        uploadedImage,
+        setUploadedImage,
+        uploadedMimeType,
+        setUploadedMimeType,
+        sentImage,
+        sentMime
+    } = useContext(Context);
+
     const [isLoaded, setIsLoaded] = useState(false);
 
     // Typing effect
@@ -34,6 +50,22 @@ const Main = ({ displayedName, animationClass }) => {
     useEffect(() => {
         setIsLoaded(true);
     }, []);
+
+    /* ----------------------------------
+       IMAGE UPLOAD (PREVIEW + SEND)
+    ------------------------------------*/
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result.split(",")[1];
+            setUploadedImage(base64);
+            setUploadedMimeType(file.type);
+        };
+        reader.readAsDataURL(file);
+    };
 
     /* ----------------------------------
        TEXT-TO-SPEECH (NO AUTO SPEAK)
@@ -198,8 +230,6 @@ const Main = ({ displayedName, animationClass }) => {
         }
     };
 
-
-
     const handleRefresh = async () => {
         // disable while refreshing
         if (isRefreshing) return;
@@ -310,6 +340,16 @@ const Main = ({ displayedName, animationClass }) => {
                     <div className="result">
                         <div className="result-title">
                             <img src={assets.user_icon} alt="" />
+
+                            {/* SENT IMAGE ABOVE USER PROMPT */}
+                            {sentImage && (
+                                <img
+                                    src={`data:${sentMime};base64,${sentImage}`}
+                                    className="chat-image-thumb"
+                                    alt="uploaded"
+                                />
+                            )}
+
                             <p>{recentPrompt}</p>
                         </div>
 
@@ -407,41 +447,83 @@ const Main = ({ displayedName, animationClass }) => {
 
                 <div className="main-bottom">
                     <div className="search-box">
-                        <input
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" && input) {
-                                    onSent();
-                                    setInput("");
-                                }
-                            }}
-                            value={input}
-                            type="text"
-                            placeholder="Enter a prompt here"
-                        />
 
-                        <div className="search-actions">
-                            <img
-                                src={assets.mic_icon}
-                                alt=""
-                                onClick={startListening}
-                                style={{ cursor: 'pointer' }}
-                            />
+                        {/* TOP: IMAGE PREVIEW CONTAINER */}
+                        {uploadedImage && (
+                            <div className="image-preview-container">
+                                <img
+                                    src={`data:${uploadedMimeType};base64,${uploadedImage}`}
+                                    className="pending-image-thumb"
+                                    alt="preview"
+                                />
+                                <button
+                                    className="pending-image-remove"
+                                    onClick={() => {
+                                        setUploadedImage(null);
+                                        setUploadedMimeType(null);
+                                    }}
+                                >
+                                    {/* SVG X ICON */}
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16">
+                                        <path d="m256 764 224-224 224 224 48-48-224-224 224-224-48-48-224 224-224-224-48 48 224 224-224 224 48 48Z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        )}
 
-                            <img
-                                onClick={() => {
-                                    if (input) {
+                        {/* BOTTOM: INPUT AND ICONS */}
+                        <div className="input-row">
+                            <input
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && (input || uploadedImage)) {
                                         onSent();
                                         setInput("");
                                     }
                                 }}
-                                src={assets.send_icon}
-                                alt="send-icon"
-                                style={{
-                                    cursor: input ? "pointer" : "not-allowed",
-                                    filter: input ? "none" : "grayscale(100%) opacity(40%)"
-                                }}
+                                value={input}
+                                type="text"
+                                placeholder="Enter a prompt here"
                             />
+
+                            <div className="search-actions">
+                                {/* UPLOAD - LEFT TO MIC */}
+                                <label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: "none" }}
+                                        onChange={handleImageUpload}
+                                    />
+                                    <img
+                                        src={assets.upload_icon}
+                                        alt="upload"
+                                        style={{ cursor: 'pointer', width: 22 }}
+                                    />
+                                </label>
+
+                                <img
+                                    src={assets.mic_icon}
+                                    alt=""
+                                    onClick={startListening}
+                                    style={{ cursor: 'pointer' }}
+                                />
+
+                                <img
+                                    onClick={() => {
+                                        if (input || uploadedImage) {
+                                            onSent();
+                                            setInput("");
+                                        }
+                                    }}
+                                    src={assets.send_icon}
+                                    alt="send-icon"
+                                    style={{
+                                        cursor: input || uploadedImage ? "pointer" : "not-allowed",
+                                        filter: input || uploadedImage ? "none" : "grayscale(100%) opacity(40%)"
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -461,7 +543,7 @@ const Main = ({ displayedName, animationClass }) => {
                 </div>
             )}
 
-            {/* Gemini-like small notification (not a third-party toast) */}
+            {/* Gemini-like small notification */}
             {notice.visible && (
                 <div className="gemini-notice" role="status" aria-live="polite">
                     {notice.text}

@@ -52,7 +52,7 @@
 .main .card{
     height: 200px;
     padding: 15px;
-    background-color: #f0f4f9;
+    background-color: #e1e6ec;
     border-radius: 10px;
     position: relative;
     cursor: pointer;
@@ -74,7 +74,7 @@
 }
 
 .main .card:hover{
-    background-color: #dfe4ea;
+    background-color: #d8dde2;
 }
 
 .main-bottom{
@@ -97,7 +97,7 @@
 }
 
 .search-box img{
-    width: 24px;
+    width: 30px;
     cursor: pointer;
 }
 
@@ -657,3 +657,202 @@
     opacity: 1;
     transform: scale(1);
 }
+
+
+
+
+/* Make search-box a positioning context for the preview bubble */
+.search-box {
+  position: relative;
+}
+
+/* Pending image preview above input */
+.pending-image-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffffee;
+  padding: 6px 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.2s ease-out;
+  z-index: 5;
+}
+
+.pending-image-thumb {
+  width: 56px;
+  height: 30px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid #e1e1e1;
+}
+
+.pending-image-remove {
+  background: #eee;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pending-image-remove:hover {
+  background: #ddd;
+}
+
+/* Sent image above the user question */
+.chat-image-thumb {
+  width: 30px;
+  border-radius: 14px;
+  margin: 0 0 10px 0;
+  border: 2px solid #e5e5e5;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Small fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 
+
+
+/* -------------------------------------------
+   UPDATED SEARCH BOX & PREVIEW STYLES
+------------------------------------------- */
+.search-box {
+    display: flex;
+    flex-direction: column;
+    /* Stack image above input */
+    align-items: flex-start;
+    /* Align content to the left */
+    justify-content: center;
+    width: 100%;
+    max-width: 900px;
+    padding: 12px 20px;
+    margin: 0 auto;
+    background-color: #f0f4f9;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+/* The container tightly wraps the image for relative positioning of the 'X' */
+.image-preview-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 12px;
+    margin-left: 5px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Preview Image Styling (60x60) */
+.pending-image-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 12px;
+    /* Softer Gemini radius */
+    border: 1px solid #e0e0e0;
+    display: block;
+}
+
+/* The 'X' button floating top-right */
+.pending-image-remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #3c4043;
+    /* Dark gray circle background */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background 0.2s, transform 0.1s;
+    z-index: 2;
+}
+
+.pending-image-remove:hover {
+    background: #5f6368;
+    transform: scale(1.05);
+}
+
+.pending-image-remove:active {
+    transform: scale(0.95);
+}
+
+/* Sizing the SVG inside the button */
+.pending-image-remove svg {
+    width: 14px;
+    /* The small inner X size */
+    height: 14px;
+    fill: currentColor;
+}
+
+/* New container for input + icons (Bottom Row) */
+.input-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 4px 8px;
+    font-size: 18px;
+}
+
+.search-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-actions img {
+    width: 24px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.search-actions img:hover {
+    transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+

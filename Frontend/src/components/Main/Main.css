@@ -97,7 +97,7 @@
 }
 
 .search-box img{
-    width: 30px;
+    width: 60px;
     cursor: pointer;
 }
 
@@ -856,3 +856,23 @@
 }
 
 
+
+
+
+/* User icon stays small */
+.result-title img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+/* Uploaded chat image (do NOT affect other images) */
+.chat-image-thumb {
+    width: 200px !important;
+    height: 200px !important;
+    height: auto;
+    margin-left: 10px;
+    border-radius: 8px;
+    object-fit: contain;
+    border-radius: 20px !important;
+}
